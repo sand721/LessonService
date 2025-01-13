@@ -96,8 +96,7 @@ public class LessonServiceAppTests
         Assert.True(result);
         Assert.Null(await _context.Lessons.FindAsync(lesson.Id));
     }
-    // Добавьте другие тесты для остальных методов
-
+   
     private Task<Lesson> NewLessonAsync(string name)
     {
         var lesson = new Lesson ( name, _unitTestData );
