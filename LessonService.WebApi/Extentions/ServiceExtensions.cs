@@ -2,6 +2,7 @@
 using FluentValidation;
 using LessonService.Application.Services;
 using LessonService.Application.Services.Mapping;
+using LessonService.Commands;
 using LessonService.Infrastructure.EF;
 using LessonService.Interfaces;
 using LessonService.WebApi.Exception;
@@ -20,7 +21,8 @@ public static class ServiceExtensions
         {
             options.MigrationsAssembly("LessonService.Infrastructure.EF");
         });
-        
+        builder.Services.AddLogging();
+        builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(CreateLessonCommandHandler).Assembly));;        
         builder.Services.AddAutoMapper(typeof(Program), typeof(LessonMapping));
         // Adding validators from the current assembly
         builder.Services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());

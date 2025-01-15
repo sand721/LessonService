@@ -4,6 +4,7 @@ using LessonService.WebApi.Extentions;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.AddApplicationServices();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
