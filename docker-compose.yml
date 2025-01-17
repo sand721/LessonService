@@ -10,7 +10,7 @@ services:
       -c "max_connections=200"
       -c "shared_buffers=256MB"
     volumes:
-      - foodmanagerdb-data:/var/lib/postgresql/data
+      - snowprolessondb-data:/var/lib/postgresql/data
     ports:
       - 5432:5432
     healthcheck:
@@ -37,7 +37,7 @@ services:
       - snowpro_net
 
 volumes:
-  foodmanagerdb-data:
+  snowprolessondb-data:
   pgadmin-data:
 
 networks:

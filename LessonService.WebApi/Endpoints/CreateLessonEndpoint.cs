@@ -11,7 +11,7 @@ public static class CreateLessonEndpoint
                 async (CreateLessonCommand command, IMediator mediator) =>
                 {
                     var result = await mediator.Send(command);
-                    return Results.Created($"{HelperEndpoint.baseUrl}/{result.Id}", result);
+                    return result.Data is not null? Results.Created($"{HelperEndpoint.baseUrl}/{result.Data.Id}", result) : Results.NotFound();
                 }), "Create a lesson", "Endpoint to create lesson")
             .WithName("CreateLesson");
     }    

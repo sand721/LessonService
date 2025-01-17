@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using LessonService.Application.Models.Lesson;
+using LessonService.Application.Models.System;
 using LessonService.Core.Base;
 using LessonService.Infrastructure.EF;
 using MediatR;
@@ -7,10 +8,14 @@ using Microsoft.Extensions.Logging;
 
 namespace LessonService.Commands;
 
-public class CreateLessonCommandHandler(AppDbContext context, ILogger<CreateLessonCommandHandler> logger, IMapper mapper) : IRequestHandler<CreateLessonCommand, LessonResponse>
+public class CreateLessonCommandHandler(
+    AppDbContext context,
+    ILogger<CreateLessonCommandHandler> logger,
+    IMapper mapper) : IRequestHandler<CreateLessonCommand, ApiResponse<LessonResponse>>
 {
-    public async Task<LessonResponse> Handle(CreateLessonCommand lessonInfo, CancellationToken cancellationToken)
+    public async Task<ApiResponse<LessonResponse>> Handle(CreateLessonCommand lessonInfo, CancellationToken cancellationToken)
     {
+        var response = new ApiResponse<LessonResponse>();
         try
         {
             var lesson = new Lesson(
@@ -26,8 +31,10 @@ public class CreateLessonCommandHandler(AppDbContext context, ILogger<CreateLess
             );
             context.Lessons.Add(lesson);
             await context.SaveChangesAsync(cancellationToken);
-            logger.LogInformation("Lesson created successfully.");
-            return mapper.Map<LessonResponse>(lesson);
+            response.Message = "Lesson created successfully.";
+            response.Data = mapper.Map<LessonResponse>(lesson);
+            logger.LogInformation(response.Message);
+            return response;
         }
         catch (Exception ex)
         {

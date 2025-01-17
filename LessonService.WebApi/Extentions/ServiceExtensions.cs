@@ -17,13 +17,16 @@ public static class ServiceExtensions
         ArgumentNullException.ThrowIfNull(builder);
         ArgumentNullException.ThrowIfNull(builder.Configuration);
         // Adding the database context
-        builder.Services.AddNpgsql<AppDbContext>("Host=localhost;Port=5432;Username=room2;Password=room2Password", options =>
+        var conStr = builder.Configuration.GetConnectionString("sqlConnection");
+        ArgumentNullException.ThrowIfNull(conStr);
+        builder.Services.AddNpgsql<AppDbContext>(conStr, options =>
         {
             options.MigrationsAssembly("LessonService.Infrastructure.EF");
         });
         builder.Services.AddLogging();
         builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(CreateLessonCommandHandler).Assembly));;        
         builder.Services.AddAutoMapper(typeof(Program), typeof(LessonMapping));
+        
         // Adding validators from the current assembly
         builder.Services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
             

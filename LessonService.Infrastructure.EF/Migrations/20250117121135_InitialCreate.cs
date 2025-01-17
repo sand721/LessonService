@@ -63,8 +63,8 @@ namespace LessonService.Infrastructure.EF.Migrations
                 columns: new[] { "Id", "DateFrom", "Description", "Name" },
                 values: new object[,]
                 {
-                    { new Guid("2f7449c3-c1a4-415f-a5f4-bd02ced6884a"), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Description 2", "Lesson 2" },
-                    { new Guid("acfd9260-55c4-44a2-a18a-e1953ba9f2cd"), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Description 1", "Lesson 1" }
+                    { new Guid("591f2f13-a49a-462e-afc1-2a94f8f24389"), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Description 2", "Lesson 2" },
+                    { new Guid("e7944d6d-6a6e-4323-af4f-a12b792282a5"), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Description 1", "Lesson 1" }
                 });
 
             migrationBuilder.CreateIndex(

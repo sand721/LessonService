@@ -1,5 +1,7 @@
 ﻿using LessonService.Application.Models.Lesson;
+using LessonService.Commands;
 using LessonService.Interfaces;
+using MediatR;
 
 namespace LessonService.WebApi.Endpoints;
 
@@ -9,12 +11,11 @@ public static class EnrollStudentEndpoint
     {
         // Endpoint to enroll a student to the lesson
         HelperEndpoint.ConfigureEndpoint(app.MapPost($"{HelperEndpoint.baseUrl}/student",
-                async (StudentRequest request, ILessonServiceApp lessonServiceApp) =>
+                async (EnrollStudentCommand command, IMediator mediator) =>
                 {
-                    var result = await lessonServiceApp.AddStudentAsync(request.LessonId, request.StudentId);
-                    return result ? Results.NoContent() : Results.NotFound();
+                    var result = await mediator.Send(command);
+                    return result.Data ? Results.NoContent() : Results.NotFound();
                 }), "Enroll a student to the lesson", "Endpoint to enroll a student to the lesson")
             .WithName("EnrollStudent");
-        
     }
 }

@@ -1,4 +1,6 @@
-﻿using LessonService.Interfaces;
+﻿using LessonService.Commands;
+using LessonService.Interfaces;
+using MediatR;
 
 namespace LessonService.WebApi.Endpoints;
 

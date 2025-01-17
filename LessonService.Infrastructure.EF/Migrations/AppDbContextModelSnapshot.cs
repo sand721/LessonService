@@ -79,7 +79,7 @@ namespace LessonService.Infrastructure.EF.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("acfd9260-55c4-44a2-a18a-e1953ba9f2cd"),
+                            Id = new Guid("e7944d6d-6a6e-4323-af4f-a12b792282a5"),
                             DateFrom = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Description = "Description 1",
                             Duration = 0,
@@ -92,7 +92,7 @@ namespace LessonService.Infrastructure.EF.Migrations
                         },
                         new
                         {
-                            Id = new Guid("2f7449c3-c1a4-415f-a5f4-bd02ced6884a"),
+                            Id = new Guid("591f2f13-a49a-462e-afc1-2a94f8f24389"),
                             DateFrom = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Description = "Description 2",
                             Duration = 0,

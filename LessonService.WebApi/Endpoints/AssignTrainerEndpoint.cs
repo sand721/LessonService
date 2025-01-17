@@ -1,5 +1,7 @@
 ﻿using LessonService.Application.Models.Lesson;
+using LessonService.Commands;
 using LessonService.Interfaces;
+using MediatR;
 
 namespace LessonService.WebApi.Endpoints;
 
@@ -9,10 +11,10 @@ public static class AssignTrainerEndpoint
     {
         // Endpoint to assign a trainer to the lesson
         HelperEndpoint.ConfigureEndpoint(app.MapPost($"{HelperEndpoint.baseUrl}/trainer",
-                async (TrainerRequest request, ILessonServiceApp lessonServiceApp) =>
+                async (AssignTrainerCommand command, IMediator mediator) =>
                 {
-                    var result = await lessonServiceApp.AssignTrainerAsync(request.LessonId, request.TrainerId);
-                    return result is not null ? Results.Created($"{HelperEndpoint.baseUrl}/{result.Id}", result) : Results.NotFound();
+                    var result = await mediator.Send(command);
+                    return result.Data is not null? Results.Created($"{HelperEndpoint.baseUrl}/{result.Data.Id}", result) : Results.NotFound();
                 }), "Assign a trainer to the lesson", "Endpoint to assign a trainer to the lesson")
             .WithName("AssignTrainer");
     }

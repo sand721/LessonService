@@ -1,4 +1,8 @@
-﻿namespace LessonService.WebApi.Endpoints;
+﻿using LessonService.Application.Models.System;
+using LessonService.Commands;
+using MediatR;
+
+namespace LessonService.WebApi.Endpoints;
 
 public static class HelperEndpoint
 {
@@ -10,5 +14,5 @@ public static class HelperEndpoint
     {
         return builder.WithTags("LessonService").WithSummary(summary).WithDescription(description);
     }
-    
+   
 }

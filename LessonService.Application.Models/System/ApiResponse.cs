@@ -6,8 +6,13 @@
 /// <typeparam name="T">The type of the data payload.</typeparam>
 public class ApiResponse<T>
 {
-    public T Data { get; set; }
+    public T? Data { get; set; }
     public string Message { get; set; }
+
+    public ApiResponse()
+    {
+        Message = "Unknown error";
+    }
 
     public ApiResponse(T data, string message)
     {
