@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using LessonService.Application.Models.Lesson;
-using LessonService.Core.Base;
+using LessonService.Domain.Entities;
+using LessonService.Domain.Entities.Base;
 
 namespace LessonService.Application.Services.Mapping;
 

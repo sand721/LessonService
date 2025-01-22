@@ -1,4 +1,4 @@
-﻿using LessonService.Core.Base;
+﻿using LessonService.Domain.Entities.Base;
 
 namespace LessonService.Application.Models.Lesson;
 

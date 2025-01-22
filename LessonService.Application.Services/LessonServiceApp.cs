@@ -1,6 +1,9 @@
 ﻿using AutoMapper;
 using LessonService.Application.Models.Lesson;
-using LessonService.Core.Base;
+using LessonService.Domain.Entities;
+using LessonService.Domain.Entities.Base.Exceptions;
+using LessonService.Domain.Entities.Enums;
+using LessonService.Domain.ValueObjects;
 using LessonService.Infrastructure.EF;
 using LessonService.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -15,11 +18,15 @@ public class LessonServiceApp(AppDbContext context, ILogger<LessonServiceApp> lo
     {
         try
         {
-            var lessons = await context.Lessons.ToListAsync();
-
+            var lessons = await context.Lessons
+                .Where(lesson => true)
+                .Include(lesson => lesson.Trainer)
+                .Include(lesson => lesson.LessonGroups)
+                .ToListAsync();
+                
             return lessons.Select(lesson => new LessonResponse(lesson.Id, lesson.Name, lesson.Description,
                 lesson.DateFrom, lesson.Duration, lesson.MaxStudents, lesson.LessonType, lesson.TrainingLevel,
-                lesson.LessonStatus, lesson.TrainerId));
+                lesson.LessonStatus, lesson.Trainer?.Name));
             //mapper.Map<IEnumerable<LessonResponse>>(lessons);
         }
         catch (Exception e)
@@ -33,7 +40,7 @@ public class LessonServiceApp(AppDbContext context, ILogger<LessonServiceApp> lo
     {
         try
         {
-            var lesson = await FindLesson(lessonId);
+            var lesson = await FindLesson(lessonId, new CancellationToken());
             if (lesson == null)
                 return null;        
             lesson.Reschedule(updateRequest.date, updateRequest.duration);
@@ -52,7 +59,7 @@ public class LessonServiceApp(AppDbContext context, ILogger<LessonServiceApp> lo
     {
         try
         {
-            var lesson = await FindLesson(lessonId);
+            var lesson = await FindLesson(lessonId, new CancellationToken());
             if (lesson == null)
                 return null;
             return mapper.Map<LessonResponse>(lesson);
@@ -64,38 +71,11 @@ public class LessonServiceApp(AppDbContext context, ILogger<LessonServiceApp> lo
         }
     }
 
-    public async Task<LessonResponse?> CreateLessonAsync(CreateLessonRequest lessonInfo)
-    {
-        try
-        {
-            var lesson = new Lesson(
-                Guid.Empty,
-                lessonInfo.Name,
-                lessonInfo.Description,
-                DateTime.SpecifyKind(lessonInfo.DateFrom, DateTimeKind.Utc),
-                lessonInfo.Duration,
-                (TrainingLevel)lessonInfo.TrainingLevel,
-                (LessonType)lessonInfo.LessonType,
-                lessonInfo.MaxStudents,
-                lessonInfo.TrainerId
-            );
-            context.Lessons.Add(lesson);
-            await context.SaveChangesAsync();
-            logger.LogInformation("Lesson created successfully.");
-            return mapper.Map<LessonResponse>(lesson);
-        }
-        catch (Exception ex)
-        {
-            logger.LogError($"Error creating lesson: {ex.Message}");
-            throw;
-        }
-    }
-
     public async Task<LessonResponse?> UpdateLessonAsync(Guid id, UpdateLessonRequest lessonInfo)
     {
         try
         {
-            var lesson = await FindLesson(id);
+            var lesson = await FindLesson(id, new CancellationToken());
             if (lesson == null)
                 return null;
             if (lesson.LessonStatus != LessonStatus.Scheduled)
@@ -122,9 +102,9 @@ public class LessonServiceApp(AppDbContext context, ILogger<LessonServiceApp> lo
         }
     }
 
-public async Task<LessonResponse?> UpdateLessonAsync(Guid lessonId, CreateLessonRequest lessonInfo)
+    public async Task<LessonResponse?> UpdateLessonAsync(Guid lessonId, CreateLessonRequest lessonInfo)
     {
-        var lesson = await FindLesson(lessonId);
+        var lesson = await FindLesson(lessonId, new CancellationToken());
         if (lesson == null)
             return null;
         return mapper.Map<LessonResponse>(lesson);    
@@ -134,9 +114,11 @@ public async Task<LessonResponse?> UpdateLessonAsync(Guid lessonId, CreateLesson
     {
         try
         {
-            var lesson = await FindLesson(lessonId);
+            var lesson = await FindLesson(lessonId, new CancellationToken());
             if (lesson == null)
                 return false;
+             
+            context.LessonGroups.RemoveRange(lesson.LessonGroups);
             context.Lessons.Remove(lesson);
             await context.SaveChangesAsync();
             logger.LogInformation("Lesson deleted successfully.");
@@ -148,30 +130,12 @@ public async Task<LessonResponse?> UpdateLessonAsync(Guid lessonId, CreateLesson
             throw;
         }
     }
-    public async Task<LessonResponse?> AssignTrainerAsync(Guid lessonId, Guid trainerId)
-    {
-        try
-        {
-            var lesson = await FindLesson(lessonId);
-            if (lesson == null)
-                return null;
-            lesson.AssignTrainer(trainerId);
-            await context.SaveChangesAsync();
-            logger.LogInformation("Trainer assigned successfully.");
-            return mapper.Map<LessonResponse>(lesson);    
-        }
-        catch (Exception ex)
-        {
-            logger.LogError($"Error getting lesson: {ex.Message}");
-            throw;
-        }
-    }
 
     public async Task<bool> RemoveTrainerAsync(Guid lessonId)
     {
         try
         {
-            var lesson = await FindLesson(lessonId);
+            var lesson = await FindLesson(lessonId,new CancellationToken());
             if (lesson == null)
                 return false;
             lesson.RemoveTrainer();
@@ -182,26 +146,6 @@ public async Task<LessonResponse?> UpdateLessonAsync(Guid lessonId, CreateLesson
         catch (Exception ex)
         {
             logger.LogError($"Error getting lesson: {ex.Message}");
-            throw;
-        }
-    }
-
-    public async Task<bool> AddStudentAsync(Guid lessonId, Guid studentId)
-    {
-        try
-        {
-            var lesson = await FindLesson(lessonId);
-            if (lesson == null)
-                return false;
-            var group = new LessonGroup() { Lesson = lesson, StudentId = studentId, LessonId = lessonId };
-            context.LessonGroups.Add(group);
-            await context.SaveChangesAsync();
-            logger.LogInformation("Student added successfully.");
-            return true;    
-        }
-        catch (Exception ex)
-        {
-            logger.LogError($"Error adding student: {ex.Message}");
             throw;
         }
     }
@@ -225,12 +169,12 @@ public async Task<LessonResponse?> UpdateLessonAsync(Guid lessonId, CreateLesson
         }
     }
 
-    public async Task<List<Guid>> GetAllStudentsOfLessonAsync(Guid lessonId)
+    public async Task<List<string>> GetAllStudentsOfLessonAsync(Guid lessonId)
     {
         try
         {
-            var lesson = await FindLesson(lessonId);
-            return await context.LessonGroups.Where(lg=>lg.LessonId==lessonId).Select(p=>p.StudentId).ToListAsync();
+            var lesson = await FindLesson(lessonId, new CancellationToken());
+            return await context.LessonGroups.Where(lg=>lg.LessonId==lessonId).Select(p=>p.Student.Name.Name).ToListAsync();
         }
         catch (Exception ex)
         {
@@ -239,24 +183,28 @@ public async Task<LessonResponse?> UpdateLessonAsync(Guid lessonId, CreateLesson
         }    
     }
 
-    private async Task<Lesson?> FindLesson(Guid lessonId)
+    public async Task<Lesson?> FindLesson(Guid lessonId,CancellationToken cancellationToken)
     {
-        var lesson = await context.Lessons.FindAsync(lessonId);
+        var lesson = await context.Lessons
+            .Include(l => l.Trainer)
+            .Include(l => l.LessonGroups)
+            .FirstOrDefaultAsync(l => l.Id == lessonId, cancellationToken: cancellationToken);            
+
         if (lesson == null)
         {
-            logger.LogError($"Lesson with ID: {lessonId} not found.");
+            throw new LessonIsNotFoundException(lessonId);
         }
         return lesson;
     }
-    private async Task<LessonGroup?> FindGroup(Guid lessonId, Guid studentId)
+    public async Task<LessonGroup?> FindGroup(Guid lessonId, Guid studentId)
     {
-        var group = await context.LessonGroups.FirstOrDefaultAsync(x => x.LessonId == lessonId && x.StudentId == studentId);
+        var group = await context.LessonGroups
+            .Include(g => g.Student)
+            .FirstOrDefaultAsync(x => x.LessonId == lessonId && x.Student.Id == studentId);
         if (group == null)
         {
             logger.LogError($"Student with ID: {studentId} not found.");
         }
         return group;
     }
-    
-    
 }

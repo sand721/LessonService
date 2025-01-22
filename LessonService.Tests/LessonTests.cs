@@ -1,4 +1,4 @@
-﻿using LessonService.Core.Interfaces;
+﻿using LessonService.Domain.Entities.Interfaces;
 using Moq;
 
 namespace LessonService.Tests;

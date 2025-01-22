@@ -4,10 +4,15 @@
         <TargetFramework>net9.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
+	<NoWarn>CS8509</NoWarn>
+	<RootNamespace>LessonService.Domain.Entities</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\LessonService.Domain.Entities\LessonService.Domain.Entities.csproj" />
+      <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="9.0.0" />
+    </ItemGroup>
+
+    <ItemGroup>
       <ProjectReference Include="..\LessonService.Domain.ValueObjects\LessonService.Domain.ValueObjects.csproj" />
     </ItemGroup>
 

@@ -1,4 +1,5 @@
-﻿using LessonService.Core.Base;
+﻿using LessonService.Domain.Entities;
+using LessonService.Domain.Entities.Base;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -8,12 +9,18 @@ public class GroupConfiguration : IEntityTypeConfiguration<LessonGroup>
 {
     public void Configure(EntityTypeBuilder<LessonGroup> builder)
     {
-        builder.ToTable("LessonGroups");
-        builder.HasKey(e => new { e.StudentId, e.LessonId });
-        builder.HasOne(e => e.Lesson)
+        // Установка первичного ключа
+        builder.HasKey(lg => new { lg.LessonId, lg.StudentId });
+
+        // Настройка связи с сущностью Lesson
+        builder.HasOne(lg => lg.Lesson)
             .WithMany(l => l.LessonGroups)
-            .HasForeignKey(e => e.LessonId);
-        builder.Property(e => e.StudentId).IsRequired();
-        builder.Property(e => e.LessonId).IsRequired();
+            .HasForeignKey(lg => lg.LessonId);
+
+        // Настройка связи с сущностью Student
+        builder.HasOne(lg => lg.Student)
+            .WithMany(s => s.LessonGroups)
+            .HasForeignKey(s => s.StudentId);
+        //.UsingEntity(j => j.ToTable("LessonGroupStudents"));
     }
 }

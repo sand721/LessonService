@@ -1,4 +1,7 @@
-﻿namespace LessonService.WebApi.Endpoints;
+﻿using LessonService.WebApi.Endpoints.Commands;
+using LessonService.WebApi.Endpoints.LessonService;
+
+namespace LessonService.WebApi.Endpoints;
 
 public static class LessonEndpoints
 {
@@ -19,6 +22,7 @@ public static class LessonEndpoints
         UnEnrollStudentEndpoint.Map(app);
         GetAllStudentsOfLessonEndpoint.Map(app);
         UpdateLessonEndpoint.Map(app);
+        RescheduleEndpoint.Map(app);
         return app;
     }
 

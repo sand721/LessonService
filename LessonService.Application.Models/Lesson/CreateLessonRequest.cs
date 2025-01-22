@@ -9,5 +9,6 @@ public record CreateLessonRequest
     int MaxStudents,
     int LessonType,
     int TrainingLevel,
-    Guid TrainerId
+    Guid TrainerId,
+    string TrainerName
 );

@@ -1,4 +1,5 @@
-﻿using LessonService.Core.Base;
+﻿using LessonService.Domain.Entities;
+using LessonService.Domain.Entities.Base;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 
@@ -8,6 +9,8 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
 {
     public DbSet<Lesson> Lessons { get; set; }
     public DbSet<LessonGroup> LessonGroups { get; set; }
+    public DbSet<Trainer> Trainers { get; set; }
+    public DbSet<Student> Students { get; set; }
 
     /// <summary>
     /// Constructor to configure the database context 

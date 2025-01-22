@@ -1,4 +1,6 @@
-﻿using LessonService.Core.Base;
+﻿using LessonService.Domain.Entities;
+using LessonService.Domain.Entities.Enums;
+using LessonService.Domain.ValueObjects;
 
 namespace LessonService.Application.Models.Lesson;
 
@@ -13,5 +15,6 @@ public record LessonResponse
     LessonType LessonType,
     TrainingLevel TrainingLevel,
     LessonStatus LessonStatus,
-    Guid TrainerId
+//    Guid? TrainerId,
+    PersonName? TrainerName 
 );
